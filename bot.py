@@ -1,7 +1,7 @@
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackContext,CallbackQueryHandler
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackContext,CallbackQueryHandler, JobQueue
 from difflib import get_close_matches
 import requests
 import asyncio
@@ -296,6 +296,9 @@ def main():
     print("Starting Telegram bot...")
 
     application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
+ # Create a JobQueue and add it to the application
+    job_queue = application.job_queue
+    job_queue.run_repeating(scheduled_updates, interval=3600, first=10)  # Schedule periodic tasks
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("addmovie", add_movie))
