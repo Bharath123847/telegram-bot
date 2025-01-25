@@ -30,14 +30,14 @@ def setup_google_sheets():
 
 # Webhook handler for Telegram updates
 @app.route(f'/{TELEGRAM_BOT_TOKEN}', methods=['POST'])
-def handle_webhook():
+async def handle_webhook():
     # Get the update sent by Telegram (JSON data)
     update = request.get_json()
 
     # Handle the update using the application object
     application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
     update_obj = Update.de_json(update, application.bot)  # Parse the update JSON to an Update object
-    application.process_update(update_obj)  # Process the update with the new API
+    await application.process_update(update_obj)  # Await the async method
 
     return "OK"  # Return OK to Telegram to acknowledge the request
 
