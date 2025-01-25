@@ -3,6 +3,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackContext,CallbackQueryHandler, JobQueue
 from difflib import get_close_matches
+from flask import Flask, request
 import requests
 import asyncio
 import json
@@ -11,12 +12,30 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 
 PORT = int(os.environ.get("PORT", 8443))  # Default to 8443 if PORT is not set
-
+app = Flask(__name__)
 # Replace with your bot token
 TELEGRAM_BOT_TOKEN = "7289730803:AAFScOEG1bzaTHOw_lIJj_TOle75clwg7qE"
 
 # Replace with the correct group/channel ID
 GROUP_CHAT_ID = "-1002338492807"  # Replace this with your actual group chat ID
+
+# Set up the webhook handler for the Telegram bot
+@app.route(f'/{TELEGRAM_BOT_TOKEN}', methods=['POST'])
+def handle_webhook():
+    # Get the update sent by Telegram (JSON data)
+    update = request.get_json()
+    
+    # Handle the update
+    # Pass the update to the bot to handle it
+    application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
+    update_obj = Update.de_json(update, application.bot)
+    application.dispatcher.process_update(update_obj)
+
+    return "OK"  # Return OK to Telegram to acknowledge the request
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8443)
+
 
 # Google Sheets Setup
 def setup_google_sheets():
