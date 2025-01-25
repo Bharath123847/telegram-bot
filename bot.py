@@ -28,28 +28,24 @@ def setup_google_sheets():
     except Exception as e:
         raise Exception(f"Error setting up Google Sheets: {e}")
 
-# Webhook handler for Telegram updates
+# Set up the webhook handler for the Telegram bot
 @app.route(f'/{TELEGRAM_BOT_TOKEN}', methods=['POST'])
-def handle_webhook():
+async def handle_webhook():
     # Get the update sent by Telegram (JSON data)
     update = request.get_json()
 
-    # Handle the update
-    # Pass the update to the bot to handle it
+    # Initialize the application and process the update asynchronously
     application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
     update_obj = Update.de_json(update, application.bot)
-    
-    # Process the update synchronously
-    application.process_update(update_obj)
+
+    # Properly await the processing of the update
+    await application.bot.process_update(update_obj)
 
     return "OK"  # Return OK to Telegram to acknowledge the request
 
-
-
-# Your other handlers and bot setup go here, for example, the handle_movie_query, start, etc.
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8443)
+
 
 
 
