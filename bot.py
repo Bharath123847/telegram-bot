@@ -304,7 +304,7 @@ def main():
     job_queue.run_repeating(scheduled_updates, interval=3600, first=10)  # Schedule periodic tasks
 
         # Set up the webhook
-    webhook_url = f"https://{os.environ['https://telegram-bot-cby1.onrender.com']}/{TELEGRAM_BOT_TOKEN}"
+    webhook_url = f"https://{os.environ['RENDER_EXTERNAL_URL']}/{TELEGRAM_BOT_TOKEN}"
     application.run_webhook(
         listen="0.0.0.0",
         port=int(os.environ.get("PORT", 8443)),
