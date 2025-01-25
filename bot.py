@@ -5,6 +5,9 @@ from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, fil
 from difflib import get_close_matches
 import requests
 import asyncio
+import json
+import os
+from oauth2client.service_account import ServiceAccountCredentials
 
 # Replace with your bot token
 TELEGRAM_BOT_TOKEN = "7289730803:AAFScOEG1bzaTHOw_lIJj_TOle75clwg7qE"
@@ -15,14 +18,19 @@ GROUP_CHAT_ID = "-1002338492807"  # Replace this with your actual group chat ID
 # Google Sheets Setup
 def setup_google_sheets():
     try:
+        # Load the credentials from the environment variable
+        credentials_json = os.environ["GOOGLE_APPLICATION_CREDENTIALS_JSON"]
+        credentials_dict = json.loads(credentials_json)
+
+        # Define the scope and authenticate
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        credentials = ServiceAccountCredentials.from_json_keyfile_name(
-            "C:/Users/bhara/OneDrive/Desktop/Bot/credentials.json", scope
-        )
+        credentials = ServiceAccountCredentials.from_json_keyfile_dict(credentials_dict, scope)
         client = gspread.authorize(credentials)
+
+        # Open the Google Sheet by ID
         sheet = client.open_by_key("1tA19pOdq2fS6eAREimyD4YEH3m5TCvOb4WqlUCN-2FM")
         worksheet = sheet.get_worksheet(0)  # Access the first worksheet
-        print("Google Sheets connected successfully.")  # Debug log
+        print("Google Sheets connected successfully.")
         return worksheet
     except Exception as e:
         raise Exception(f"Error setting up Google Sheets: {e}")
