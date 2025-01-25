@@ -9,6 +9,9 @@ import json
 import os
 from oauth2client.service_account import ServiceAccountCredentials
 
+
+PORT = int(os.environ.get("PORT", 8443))  # Default to 8443 if PORT is not set
+
 # Replace with your bot token
 TELEGRAM_BOT_TOKEN = "7289730803:AAFScOEG1bzaTHOw_lIJj_TOle75clwg7qE"
 
