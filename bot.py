@@ -28,17 +28,19 @@ def setup_google_sheets():
     except Exception as e:
         raise Exception(f"Error setting up Google Sheets: {e}")
 
-@app.route(f'/{TELEGRAM_BOT_TOKEN}', methods=['POST'])
+# Flask route to handle webhook
+@app.route(f"/{TELEGRAM_BOT_TOKEN}", methods=["POST"])
 async def handle_webhook():
-    update = request.get_json()  # Get the update from Telegram
+    update = Update.de_json(request.get_json(), application.bot)
+    await application.process_update(update)
+    return "OK", 200
 
-    application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
-    update_obj = Update.de_json(update, application.bot)
+# Flask root route
+@app.route("/", methods=["GET"])
+def home():
+    return "Telegram bot is running. Use the webhook URL for communication."
 
-    # Ensure this is awaited
-    await application.process_update(update_obj)
-    
-    return "OK"
+
 # Handle movie queries
 async def handle_movie_query(update: Update, context: CallbackContext) -> None:
     query = update.message.text.strip().lower()
@@ -274,7 +276,7 @@ async def list_movies(update: Update, context: CallbackContext) -> None:
 
         await update.message.reply_text(response, parse_mode="Markdown")
         if len(records) > end_index:
-            await update.message.reply_text(f"Use `/listmovies {page + 1}` for the next page.")
+            await update.message.reply_text(f"Use /listmovies {page + 1} for the next page.")
     except Exception as e:
         await update.message.reply_text(f"Error fetching movies: {e}")
 
@@ -331,5 +333,6 @@ def main():
     application.run_polling(timeout=60)
     print("Bot is running.")
 
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8443)))
+    main()
