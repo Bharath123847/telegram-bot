@@ -1,40 +1,47 @@
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackContext,CallbackQueryHandler, JobQueue
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackContext, CallbackQueryHandler, JobQueue
 from difflib import get_close_matches
 from flask import Flask, request
 import requests
-import asyncio
 import json
 import os
 from oauth2client.service_account import ServiceAccountCredentials
 
-
-PORT = int(os.environ.get("PORT", 8443))  # Default to 8443 if PORT is not set
 app = Flask(__name__)
+
 # Replace with your bot token
 TELEGRAM_BOT_TOKEN = "7289730803:AAFScOEG1bzaTHOw_lIJj_TOle75clwg7qE"
 
-# Replace with the correct group/channel ID
-GROUP_CHAT_ID = "-1002338492807"  # Replace this with your actual group chat ID
+# Google Sheets Setup
+def setup_google_sheets():
+    try:
+        credentials_json = os.environ["GOOGLE_APPLICATION_CREDENTIALS_JSON"]
+        credentials_dict = json.loads(credentials_json)
+        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+        credentials = ServiceAccountCredentials.from_json_keyfile_dict(credentials_dict, scope)
+        client = gspread.authorize(credentials)
+        sheet = client.open_by_key("1tA19pOdq2fS6eAREimyD4YEH3m5TCvOb4WqlUCN-2FM")
+        worksheet = sheet.get_worksheet(0)  # Access the first worksheet
+        return worksheet
+    except Exception as e:
+        raise Exception(f"Error setting up Google Sheets: {e}")
 
-# Set up the webhook handler for the Telegram bot
+# Webhook handler for Telegram updates
 @app.route(f'/{TELEGRAM_BOT_TOKEN}', methods=['POST'])
 def handle_webhook():
-    # Get the update sent by Telegram (JSON data)
-    update = request.get_json()
-    
-    # Handle the update
-    # Pass the update to the bot to handle it
+    update = request.get_json()  # Get the update sent by Telegram
     application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
     update_obj = Update.de_json(update, application.bot)
     application.dispatcher.process_update(update_obj)
-
     return "OK"  # Return OK to Telegram to acknowledge the request
+
+# Your other handlers and bot setup go here, for example, the handle_movie_query, start, etc.
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8443)
+
 
 
 # Google Sheets Setup
