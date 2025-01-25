@@ -303,6 +303,15 @@ def main():
     job_queue = application.job_queue
     job_queue.run_repeating(scheduled_updates, interval=3600, first=10)  # Schedule periodic tasks
 
+        # Set up the webhook
+    webhook_url = f"https://{os.environ['RENDER_EXTERNAL_URL']}/{TELEGRAM_BOT_TOKEN}"
+    application.run_webhook(
+        listen="0.0.0.0",
+        port=int(os.environ.get("PORT", 8443)),
+        url_path=TELEGRAM_BOT_TOKEN,
+        webhook_url=webhook_url,
+    )
+
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("addmovie", add_movie))
     application.add_handler(CommandHandler("help", group_help))
