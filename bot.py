@@ -28,18 +28,16 @@ def setup_google_sheets():
     except Exception as e:
         raise Exception(f"Error setting up Google Sheets: {e}")
 
-# Flask route to handle webhook
+@app.route("/", methods=["GET"])
+def home():
+    return "Telegram bot is running. Use the webhook URL for communication."
+
+
 @app.route(f"/{TELEGRAM_BOT_TOKEN}", methods=["POST"])
 async def handle_webhook():
     update = Update.de_json(request.get_json(), application.bot)
     await application.process_update(update)
     return "OK", 200
-
-# Flask root route
-@app.route("/", methods=["GET"])
-def home():
-    return "Telegram bot is running. Use the webhook URL for communication."
-
 
 # Handle movie queries
 async def handle_movie_query(update: Update, context: CallbackContext) -> None:
@@ -333,7 +331,5 @@ def main():
     application.run_polling(timeout=60)
     print("Bot is running.")
 
-
 if __name__ == "__main__":
-    main()
-
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8443)))
