@@ -49,25 +49,6 @@ if __name__ == '__main__':
 
 
 
-# Google Sheets Setup
-def setup_google_sheets():
-    try:
-        # Load the credentials from the environment variable
-        credentials_json = os.environ["GOOGLE_APPLICATION_CREDENTIALS_JSON"]
-        credentials_dict = json.loads(credentials_json)
-
-        # Define the scope and authenticate
-        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        credentials = ServiceAccountCredentials.from_json_keyfile_dict(credentials_dict, scope)
-        client = gspread.authorize(credentials)
-
-        # Open the Google Sheet by ID
-        sheet = client.open_by_key("1tA19pOdq2fS6eAREimyD4YEH3m5TCvOb4WqlUCN-2FM")
-        worksheet = sheet.get_worksheet(0)  # Access the first worksheet
-        print("Google Sheets connected successfully.")
-        return worksheet
-    except Exception as e:
-        raise Exception(f"Error setting up Google Sheets: {e}")
 
 # Handle movie queries
 async def handle_movie_query(update: Update, context: CallbackContext) -> None:
